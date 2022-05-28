@@ -3,6 +3,5 @@
 TIE Invader is a space invaders arcade game insired from Star Wars.
 Made with Phaser 3.
 
-![Screenshot](https://i.imgur.com/XGgkB5I.png)
-
+![Screenshot]( https://imgur.com/ONY9HJ1 )
 [ Play Game ]( https://tie-invader.herokuapp.com )
