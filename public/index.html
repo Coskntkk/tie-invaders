@@ -1,0 +1,219 @@
+<!doctype html> 
+<html lang="en"> 
+<head> 
+    <meta charset="UTF-8" />
+    <meta name="description" content="A space invader game inspired by Star Wars, made by Phaser 3">
+    <link rel="icon" type="image/x-icon" href="asset/player.png">
+    <link rel="stylesheet" href="styles.css">
+    <title>TIE Invader</title>
+    <script src="//cdn.jsdelivr.net/npm/phaser@3.11.0/dist/phaser.js"></script>
+</head>
+<body>
+    <header><h1>TIE INVADER</h1></header>
+    
+<script type="text/javascript">
+
+let config = {
+    type: Phaser.AUTO,
+    width: 800,
+    height: 600,
+    physics: {
+        default: 'arcade',
+        arcade: {
+            gravity: { y: 0 },
+            debug: false
+        }
+    },
+    scene: {
+        preload: preload,
+        create: create,
+        update: update
+    }
+};
+
+// Entities
+let player;
+let enemies;
+// Groups
+let playerFires;
+let enemyFires;
+let cursors;
+// States
+let gameOver = false;
+let isPlayerAlive = true;
+let score = 0;
+let direction = 1
+// Shoot
+let cooldown = 10;
+let cooldownActive = false;
+// Enemy fire
+let enemyCooldown = 100;
+let enemyCooldownActive = true;
+// Layout
+let width;
+let scoreText;
+let finalText;
+let finalMessage = `Game over. Your score is ${score}.
+Refresh the page to play again.`;
+let tutorial;
+let tutorialText = `How to play:
+⬅️ Left Arrow
+Right Arrow ➡️
+Space 💥`;
+
+let game = new Phaser.Game(config);
+
+function preload() {
+    this.load.image('background', 'asset/spacebg.png');
+    this.load.image('player', 'asset/player.png');
+    this.load.image('enemy', 'asset/enemy.png');
+    this.load.image('playerFire', 'asset/player_fire.png');
+    this.load.image('enemyFire', 'asset/enemy_fire.png');
+}
+
+function create () {
+    //  Background 
+    this.add.image(400, 300, 'background');
+    scoreText = this.add.text(8, 4, 'Score: 0', { fontSize: '24px', fill: 'yellow' });
+    tutorial = this.add.text(250, 200, tutorialText, { fontSize: '36px', fill: 'gold' });
+    width = document.getElementsByTagName("canvas")[0].offsetWidth - 20;
+
+    // The player and its settings
+    player = this.physics.add.sprite(400, 550, 'player');
+    player.setCollideWorldBounds(true);
+
+    //  Input Events
+    cursors = this.input.keyboard.createCursorKeys();
+
+    // Enemies
+    let enemyLocs = [[25, 50, 10], [85, 100, 8], [145, 150, 6]];
+    enemies = this.add.group();
+    enemyLocs.forEach((locs) => {
+        for (let i=0; i<locs[2]; i++) {
+            enemies.add(this.physics.add.sprite((locs[0] + (i * 60)), locs[1], "enemy" ));
+        }
+    });
+
+    // Bullets
+    playerFires = this.add.group();
+    enemyFires = this.add.group();
+}
+
+function update ()
+{
+    if (gameOver || enemies.getLength() === 0) {
+        gameover(this);
+        return;
+    }
+
+    // Cooldown
+    if (cooldownActive === true) {
+        cooldown--;
+    } 
+    if (cooldown === 0) {
+        cooldownActive = false;
+        cooldown = 100;
+    }
+
+    playerShoot(this);
+    moveEnemies();
+    enemyShoot(this);
+    moveBullets();
+}
+
+const gameover = (game) => {
+    player.setVelocityX(0)
+    finalText = game.add.text(75, 250, finalMessage, { fontSize: '36px', fill: 'gold' });
+    tutorial.destroy();
+    enemyFires.getChildren().forEach((fire) => fire.destroy());
+};
+
+const moveBullets = () => {
+    // Move player bullets
+    let playerFiresChildren = playerFires.getChildren();
+    playerFiresChildren.forEach((child) => {
+        if (child.y < 0) {
+            child.destroy();
+        }
+        if (child instanceof Phaser.GameObjects.Sprite) {
+            child.y -= 5;
+        }
+    });
+    // Move enemy bullets
+    let enemyFiresChildren = enemyFires.getChildren();
+    enemyFiresChildren.forEach((child) => {
+        if (child.y > 600) {
+            child.destroy();
+        }
+        if (child instanceof Phaser.GameObjects.Sprite) {
+            child.y += 5;
+        }
+    });
+};
+
+const moveEnemies = () => {
+    // Enemies
+    let latest = Math.max(...enemies.getChildren().map(o => o.x));
+    let firstest = Math.min(...enemies.getChildren().map(o => o.x));
+    if (latest > (width-25) || firstest < 25 ) {
+        direction = direction * -1;
+    }
+    // Move enemies
+    let enemiesChildren = enemies.getChildren();
+    enemiesChildren.forEach((child) => {
+        if (child instanceof Phaser.GameObjects.Sprite) {
+            child.x += direction;
+        }
+    });
+}
+
+const enemyShoot = (game) => {
+    // Enemy Shoots
+    if (enemyCooldownActive === true) {
+        enemyCooldown--;
+    } 
+    if (enemyCooldown === 0) {
+        cooldownActive = false;
+        let shootedEnemy = enemies.getChildren()[Math.floor(Math.random()*enemies.getChildren().length)];
+        let newEnemyFire = game.physics.add.sprite(shootedEnemy.x, shootedEnemy.y, "enemyFire" );
+        enemyFires.add(newEnemyFire);
+        game.physics.add.collider(player, newEnemyFire, (player) => {
+            gameOver = true;
+            player.setTint(0xff0000);
+            isPlayerAlive = false;
+        });
+        enemyCooldown = 100;
+    }
+}
+
+const playerShoot = (game) => {
+    // Shoot
+    if (cursors.left.isDown && isPlayerAlive) {
+        player.setVelocityX(-80);
+        tutorial.destroy();
+    } else if (cursors.right.isDown && isPlayerAlive) {
+        player.setVelocityX(80);
+        tutorial.destroy();
+    } else if (cursors.space.isDown && cooldownActive === false && isPlayerAlive) {   
+        cooldownActive = true;
+        let newFire = game.physics.add.sprite(player.x, player.y, "playerFire" );
+        playerFires.add(newFire);
+        tutorial.destroy();
+    } else {
+        player.setVelocityX(0);
+    }
+    // Add collider between enemies and player bullets
+    enemies.children.iterate((enemy) => {
+        playerFires.children.iterate((fire) => {
+            game.physics.add.collider(enemy, fire, (enemy, fire) => {
+                enemy.destroy();
+                fire.destroy();
+                score++;
+                scoreText.setText('Score: ' + score);
+            });
+        })
+    });
+}
+</script>
+</body>
+</html>

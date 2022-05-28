@@ -1,0 +1,17 @@
+{
+  "name": "tie-invader",
+  "version": "1.0.0",
+  "description": "A space invader game inspired by Star Wars, made by Phaser 3",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Coşkun Atak",
+  "license": "MIT",
+  "devDependencies": {
+  },
+  "dependencies": {
+    "express": "^4.18.1",
+    "phaser": "^3.11.0"
+  }
+}

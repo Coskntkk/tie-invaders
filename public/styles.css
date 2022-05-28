@@ -1,0 +1,31 @@
+html, body {
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    margin: 0;
+}
+body {
+    /* background-color: darkslategrey; */
+    background-image: url("asset/spacebg.png");
+    min-width:800px;
+}
+body, h1{
+    text-align: center;
+    margin: 0;
+    padding: 0;
+    color: white;
+}
+header {
+    width: 100%;
+    height: 50px;
+    padding: 15px 0 0 0;
+    margin: 0;
+    background-image: url("asset/header.png");
+    font-family: 'Courier New', Courier, monospace;
+    margin-bottom: 5%;
+}
+canvas {
+    border: 5px solid white;
+    border-radius: 20px;
+    box-sizing: border-box;
+}
