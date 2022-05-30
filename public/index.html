@@ -53,8 +53,6 @@ let enemyCooldownActive = true;
 let width;
 let scoreText;
 let finalText;
-let finalMessage = `Game over. Your score is ${score}.
-Refresh the page to play again.`;
 let tutorial;
 let tutorialText = `How to play:
 ⬅️ Left Arrow
@@ -123,7 +121,8 @@ function update ()
 
 const gameover = (game) => {
     player.setVelocityX(0)
-    finalText = game.add.text(75, 250, finalMessage, { fontSize: '36px', fill: 'gold' });
+    finalText = game.add.text(75, 250, `Game over. Your score is ${score}.
+Refresh the page to play again.`, { fontSize: '36px', fill: 'gold' });
     tutorial.destroy();
     enemyFires.getChildren().forEach((fire) => fire.destroy());
 };
