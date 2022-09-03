@@ -115,8 +115,8 @@ function update ()
     }
 
     let touch = 0;
-    if (pointer.isDown) {
-        touch = pointer.x;
+    if (this.input.activePointer.isDown) {
+        touch = this.input.activePointer.x;
     } 
 
     playerShoot(this, touch);
@@ -194,7 +194,6 @@ const enemyShoot = (game) => {
 }
 
 const playerShoot = (game, touch) => {
-    console.log(touch);
     // Shoot
     if ((cursors.left.isDown || (touch > 0 && touch < 250)) && isPlayerAlive) {
         player.setVelocityX(-80);
