@@ -10,7 +10,6 @@
 </head>
 <body>
     <header><h1>TIE INVADER</h1></header>
-    
 <script type="text/javascript">
 
 let config = {
@@ -38,6 +37,7 @@ let enemies;
 let playerFires;
 let enemyFires;
 let cursors;
+let pointer;
 // States
 let gameOver = false;
 let isPlayerAlive = true;
@@ -82,6 +82,7 @@ function create () {
 
     //  Input Events
     cursors = this.input.keyboard.createCursorKeys();
+    pointer = this.input.activePointer;
 
     // Enemies
     let enemyLocs = [[25, 50, 10], [85, 100, 8], [145, 150, 6]];
@@ -113,10 +114,17 @@ function update ()
         cooldown = 100;
     }
 
-    playerShoot(this);
+    let touch = 0;
+    if (pointer.isDown) {
+        touch = pointer.x;
+    } 
+
+    playerShoot(this, touch);
     moveEnemies();
     enemyShoot(this);
     moveBullets();
+
+
 }
 
 const gameover = (game) => {
@@ -185,15 +193,16 @@ const enemyShoot = (game) => {
     }
 }
 
-const playerShoot = (game) => {
+const playerShoot = (game, touch) => {
+    console.log(touch);
     // Shoot
-    if (cursors.left.isDown && isPlayerAlive) {
+    if ((cursors.left.isDown || (touch > 0 && touch < 250)) && isPlayerAlive) {
         player.setVelocityX(-80);
         tutorial.destroy();
-    } else if (cursors.right.isDown && isPlayerAlive) {
+    } else if ((cursors.right.isDown || touch > 550) && isPlayerAlive) {
         player.setVelocityX(80);
         tutorial.destroy();
-    } else if (cursors.space.isDown && cooldownActive === false && isPlayerAlive) {   
+    } else if ((cursors.space.isDown || (touch > 250 && touch < 550)) && cooldownActive === false && isPlayerAlive) {   
         cooldownActive = true;
         let newFire = game.physics.add.sprite(player.x, player.y, "playerFire" );
         playerFires.add(newFire);
