@@ -6,4 +6,4 @@ Made with Phaser 3.
 ![Screenshot]( https://i.imgur.com/ONY9HJ1.png )
 
 
-[ Play Game ]( https://tie-invader.herokuapp.com )
+[ Play Game ]( https://tie-invaders.cyclic.app/ )
